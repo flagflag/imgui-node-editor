@@ -337,6 +337,46 @@ void MaterialEditorApp::BuildNodes()
 		BuildNode(&node);
 }
 
+Node* MaterialEditorApp::SpawnTextureSamplerNode()
+{
+	nodes_.emplace_back(GetNextId(), "Texture Sampler", ImColor(255, 128, 128));
+	nodes_.back().Type = NodeType::Blueprint;
+	nodes_.back().Outputs.emplace_back(GetNextId(), "R", PinType::Float);
+	nodes_.back().Outputs.emplace_back(GetNextId(), "G", PinType::Float);
+	nodes_.back().Outputs.emplace_back(GetNextId(), "B", PinType::Float);
+	nodes_.back().Outputs.emplace_back(GetNextId(), "A", PinType::Float);
+
+	BuildNode(&nodes_.back());
+
+	return &nodes_.back();
+}
+
+Node* MaterialEditorApp::SpawnBinaryOperatorNode(const char* opt)
+{
+	nodes_.emplace_back(GetNextId(), opt, ImColor(128, 195, 248));
+	nodes_.back().Type = NodeType::Simple;
+	nodes_.back().Inputs.emplace_back(GetNextId(), "", PinType::Float);
+	nodes_.back().Inputs.emplace_back(GetNextId(), "", PinType::Float);
+	nodes_.back().Outputs.emplace_back(GetNextId(), "", PinType::Float);
+
+	BuildNode(&nodes_.back());
+
+	return &nodes_.back();
+}
+
+Node* MaterialEditorApp::SpawnPBRNode()
+{
+	nodes_.emplace_back(GetNextId(), "PBR");
+	nodes_.back().Inputs.emplace_back(GetNextId(), "Specular", PinType::Float);
+	nodes_.back().Inputs.emplace_back(GetNextId(), "Gloss", PinType::Float);
+
+	nodes_.back().Inputs.emplace_back(GetNextId(), "Metallic", PinType::Float);
+	nodes_.back().Inputs.emplace_back(GetNextId(), "Roughess", PinType::Float);
+
+	BuildNode(&nodes_.back());
+
+	return &nodes_.back();
+}
 
 bool MaterialEditorApp::Splitter(bool split_vertically, float thickness, float* size1, float* size2, float min_size1, float min_size2, float splitter_long_axis_size/* = -1.0f*/)
 {
@@ -1443,7 +1483,26 @@ void MaterialEditorApp::RenderContextMenu()
 		//auto drawList = ImGui::GetWindowDrawList();
 		//drawList->AddCircleFilled(ImGui::GetMousePosOnOpeningCurrentPopup(), 10.0f, 0xFFFF00FF);
 
+		static const char* opts[] =
+		{
+			"+", "-", "x", "/", "pow", "exp", "exp2", "log", "log2",
+		};
+
 		Node* node = nullptr;
+		if (ImGui::MenuItem("Texture Sampler"))
+			node = SpawnTextureSamplerNode();
+		bool clickd = false;
+		for (auto& opt : opts)
+		{
+			if (ImGui::MenuItem(opt) && !clickd)
+			{
+				node = SpawnBinaryOperatorNode(opt);
+				clickd = true;
+			}
+		}
+		if (ImGui::MenuItem("PBR"))
+			node = SpawnPBRNode();
+		ImGui::Separator();
 		if (ImGui::MenuItem("Input Action"))
 			node = SpawnInputActionNode();
 		if (ImGui::MenuItem("Output Action"))
