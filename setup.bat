@@ -1,0 +1,1 @@
+cmake examples/ -Hexamples -Bbuild -G "Visual Studio 16 2019"

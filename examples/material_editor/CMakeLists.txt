@@ -1,0 +1,11 @@
+add_example_executable(material_editor
+    main.cpp
+    material_editor_app.h
+    material_editor_app.cpp
+    utilities/builders.h
+    utilities/drawing.h
+    utilities/widgets.h
+    utilities/builders.cpp
+    utilities/drawing.cpp
+    utilities/widgets.cpp
+)
